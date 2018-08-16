@@ -8,7 +8,7 @@ import json
 from urllib import request
 
 
-logfile = 'ip.log'
+logfile = '/opt/shell/blackip/ip.log'
 API = "http://ip.taobao.com/service/getIpInfo.php?ip="
 
 
@@ -18,12 +18,18 @@ def write_log(ipaddr):
         f.write(time_str)
         f.write('\n')
         url = API + ipaddr
+        #print(url)
         # 访问淘宝的API 获取IP属地
-        jsondata = json.loads(request.urlopen(url).read())
-        if jsondata['code'] == '1':
-            ip_info = '{0}，{1} 无信息'.format(Count, IPaddr)
-        else:
-            ip_info = '{0}, 所属城市：{1}, 运营商：{2}'.format(ipaddr, jsondata['data']['city'], jsondata['data']['isp'])
+        try:
+            jsondata = json.loads(request.urlopen(url).read())
+            if jsondata['code'] == '1':
+                ip_info = '{0}，{1} 无信息'.format(Count, IPaddr)
+            else:
+                ip_info = '{0}, 所属城市：{1}, 运营商：{2}'.format(ipaddr, jsondata['data']['city'], jsondata['data']['isp'])
+
+        except Exception as err:
+            ip_info = '{0}, API访问错误：{1}'.format(ipaddr, err)
+
         f.write(ip_info)
         f.write('\n')
         f.write('######\n\n')
